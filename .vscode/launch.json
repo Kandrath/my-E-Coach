@@ -5,13 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "type": "node",
+            "name": "my_e_coach",
             "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${file}"
+            "type": "dart"
+        },
+        {
+            "name": "my_e_coach (Release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
         }
     ]
 }

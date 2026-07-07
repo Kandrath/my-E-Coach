@@ -43,10 +43,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   SizedBox(height: 5),
                   Text(
                     "Prenez soin de vous aujourd'hui.",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF7F8C8D),
-                    ),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF7F8C8D)),
                   ),
                 ],
               ),
@@ -95,7 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       offset: const Offset(0, 2),
                       blurRadius: 10,
                     ),
