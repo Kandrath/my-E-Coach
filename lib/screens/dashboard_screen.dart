@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_e_coach/screens/activity_tracking_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -15,6 +16,81 @@ class _DashboardScreenState extends State<DashboardScreen> {
     setState(() {
       _water += amount;
     });
+  }
+
+  void _showActivityOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Choisir une activité',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2C3E50),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                alignment: WrapAlignment.center,
+                children: [
+                  _activityOption('Marche', Icons.directions_walk),
+                  _activityOption('Course', Icons.directions_run),
+                  _activityOption('Vélo', Icons.directions_bike),
+                  _activityOption('Autre', Icons.fitness_center),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _activityOption(String label, IconData icon) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ActivityTrackingScreen(activityType: label),
+              ),
+            );
+          },
+          child: Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5E9),
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFFA2B997), width: 2),
+            ),
+            child: Icon(icon, color: const Color(0xFFA2B997), size: 35),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 14, color: Color(0xFF2C3E50)),
+        ),
+      ],
+    );
   }
 
   @override
@@ -137,9 +213,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               // Bouton Action Principal (CTA)
               ElevatedButton(
-                onPressed: () {
-                  // Action principale
-                },
+                onPressed: _showActivityOptions,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFA2B997),
                   foregroundColor: Colors.white,
