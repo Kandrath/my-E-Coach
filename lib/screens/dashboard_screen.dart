@@ -9,7 +9,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  final int _calories = 0;
+  int _calories = 0;
   int _water = 0; // en ml
 
   void _addWater(int amount) {
@@ -64,14 +64,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Column(
       children: [
         InkWell(
-          onTap: () {
+          onTap: () async {
             Navigator.pop(context);
-            Navigator.push(
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ActivityTrackingScreen(activityType: label),
               ),
             );
+
+            if (result != null && result is int) {
+              setState(() {
+                _calories += result;
+              });
+            }
           },
           child: Container(
             width: 70,

@@ -50,6 +50,61 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
     });
   }
 
+  void _stopActivity() {
+    _stopwatch.stop();
+    setState(() {
+      _isPaused = true;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Intensité de l\'effort'),
+        content: const Text('Comment qualifieriez-vous votre séance ?'),
+        actions: [
+          _intensityButton('Tranquille', 0.8),
+          _intensityButton('Sportif', 1.0),
+          _intensityButton('Intense', 1.3),
+        ],
+      ),
+    );
+  }
+
+  Widget _intensityButton(String label, double multiplier) {
+    return TextButton(
+      onPressed: () {
+        final calories = _calculateCalories(multiplier);
+        Navigator.pop(context); // Close dialog
+        Navigator.pop(context, calories); // Return to dashboard
+      },
+      child: Text(label),
+    );
+  }
+
+  int _calculateCalories(double intensityMultiplier) {
+    // Base kcal/min per activity type
+    double baseKcalPerMin;
+    switch (widget.activityType) {
+      case 'Marche':
+        baseKcalPerMin = 4.0;
+        break;
+      case 'Course':
+        baseKcalPerMin = 11.0;
+        break;
+      case 'Vélo':
+        baseKcalPerMin = 8.0;
+        break;
+      case 'Autre':
+      default:
+        baseKcalPerMin = 6.0;
+        break;
+    }
+
+    double minutes = _stopwatch.elapsed.inSeconds / 60.0;
+    return (baseKcalPerMin * intensityMultiplier * minutes).round();
+  }
+
   @override
   Widget build(BuildContext context) {
     final duration = _stopwatch.elapsed;
@@ -115,9 +170,7 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                    onPressed: _stopActivity,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                       foregroundColor: Colors.white,
