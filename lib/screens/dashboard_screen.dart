@@ -2,22 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:my_e_coach/screens/activity_tracking_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+  final String userName;
+  final int calories;
+  final int water;
+  final Function(int) onAddWater;
+  final Function(int) onAddCalories;
+
+  const DashboardScreen({
+    super.key,
+    required this.userName,
+    required this.calories,
+    required this.water,
+    required this.onAddWater,
+    required this.onAddCalories,
+  });
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  int _calories = 0;
-  int _water = 0; // en ml
-
-  void _addWater(int amount) {
-    setState(() {
-      _water += amount;
-    });
-  }
-
   void _showActivityOptions() {
     showModalBottomSheet(
       context: context,
@@ -74,9 +78,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             );
 
             if (result != null && result is Map<String, dynamic>) {
-              setState(() {
-                _calories += (result['calories'] as int);
-              });
+              widget.onAddCalories(result['calories'] as int);
               _showActivitySynthesis(result);
             }
           },
@@ -117,10 +119,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Bravo Alexandre ! ✨',
+        title: Text(
+          'Bravo ${widget.userName} ! ✨',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Color(0xFF2C3E50), fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Color(0xFF2C3E50), fontWeight: FontWeight.bold),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -193,17 +195,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               // En-tête
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
-                    'Bonjour, Alexandre ✨',
-                    style: TextStyle(
+                    'Bonjour, ${widget.userName} ✨',
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF2C3E50),
                     ),
                   ),
-                  SizedBox(height: 5),
-                  Text(
+                  const SizedBox(height: 5),
+                  const Text(
                     "Prenez soin de vous aujourd'hui.",
                     style: TextStyle(fontSize: 14, color: Color(0xFF7F8C8D)),
                   ),
@@ -227,7 +229,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '$_calories',
+                        '${widget.calories}',
                         style: const TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
@@ -263,7 +265,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Hydratation : ${(_water / 1000.0).toStringAsFixed(2)}L / 2.5L',
+                      'Hydratation : ${(widget.water / 1000.0).toStringAsFixed(2)}L / 2.5L',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -273,7 +275,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 15),
                     Center(
                       child: TextButton(
-                        onPressed: () => _addWater(200),
+                        onPressed: () => widget.onAddWater(200),
                         style: TextButton.styleFrom(
                           backgroundColor: const Color(0xFFE3F2FD),
                           padding: const EdgeInsets.symmetric(
