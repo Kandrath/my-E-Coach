@@ -76,7 +76,11 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
       onPressed: () {
         final calories = _calculateCalories(multiplier);
         Navigator.pop(context); // Close dialog
-        Navigator.pop(context, calories); // Return to dashboard
+        Navigator.pop(context, {
+          'calories': calories,
+          'duration': _stopwatch.elapsed,
+          'type': widget.activityType,
+        }); // Return detailed map to dashboard
       },
       child: Text(label),
     );

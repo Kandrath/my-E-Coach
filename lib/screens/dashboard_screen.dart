@@ -73,10 +73,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             );
 
-            if (result != null && result is int) {
+            if (result != null && result is Map<String, dynamic>) {
               setState(() {
-                _calories += result;
+                _calories += (result['calories'] as int);
               });
+              _showActivitySynthesis(result);
             }
           },
           child: Container(
@@ -96,6 +97,84 @@ class _DashboardScreenState extends State<DashboardScreen> {
           style: const TextStyle(fontSize: 14, color: Color(0xFF2C3E50)),
         ),
       ],
+    );
+  }
+
+  void _showActivitySynthesis(Map<String, dynamic> sessionData) {
+    final duration = sessionData['duration'] as Duration;
+    final calories = sessionData['calories'] as int;
+    final type = sessionData['type'] as String;
+
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String formattedDuration =
+        "${twoDigits(duration.inMinutes.remainder(60))}m ${twoDigits(duration.inSeconds.remainder(60))}s";
+    if (duration.inHours > 0) {
+      formattedDuration = "${duration.inHours}h $formattedDuration";
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Bravo Alexandre ! ✨',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Color(0xFF2C3E50), fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Quelle superbe séance ! Vous progressez vers vos objectifs.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFF7F8C8D)),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFAF9F6),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Column(
+                children: [
+                  _synthesisRow('Activité', type),
+                  const Divider(),
+                  _synthesisRow('Durée', formattedDuration),
+                  const Divider(),
+                  _synthesisRow('Dépense', '$calories kcal'),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFA2B997),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+              ),
+              child: const Text('CONTINUER'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _synthesisRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: const TextStyle(color: Color(0xFF7F8C8D))),
+          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF2C3E50))),
+        ],
+      ),
     );
   }
 
