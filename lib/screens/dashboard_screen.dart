@@ -104,6 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final duration = sessionData['duration'] as Duration;
     final calories = sessionData['calories'] as int;
     final type = sessionData['type'] as String;
+    final intensity = sessionData['intensity'] as String;
 
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String formattedDuration =
@@ -125,7 +126,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'Quelle superbe séance ! Vous progressez vers vos objectifs.',
+              'Quelle superbe séance ! Vous progressez vers vos objectifs. N\'oubliez pas de bien vous hydrater pour récupérer ! 💧',
               textAlign: TextAlign.center,
               style: TextStyle(color: Color(0xFF7F8C8D)),
             ),
@@ -138,7 +139,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: Column(
                 children: [
-                  _synthesisRow('Activité', type),
+                  _synthesisRow('Activité', '$type ($intensity)'),
                   const Divider(),
                   _synthesisRow('Durée', formattedDuration),
                   const Divider(),

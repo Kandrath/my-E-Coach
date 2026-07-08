@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ActivityTrackingScreen extends StatefulWidget {
@@ -14,6 +15,13 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
   late Stopwatch _stopwatch;
   late Timer _timer;
   bool _isPaused = false;
+
+  Duration get _effectiveDuration {
+    if (kDebugMode) {
+      return _stopwatch.elapsed * 60;
+    }
+    return _stopwatch.elapsed;
+  }
 
   @override
   void initState() {
@@ -78,8 +86,9 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
         Navigator.pop(context); // Close dialog
         Navigator.pop(context, {
           'calories': calories,
-          'duration': _stopwatch.elapsed,
+          'duration': _effectiveDuration,
           'type': widget.activityType,
+          'intensity': label,
         }); // Return detailed map to dashboard
       },
       child: Text(label),
@@ -105,13 +114,13 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
         break;
     }
 
-    double minutes = _stopwatch.elapsed.inSeconds / 60.0;
+    double minutes = _effectiveDuration.inSeconds / 60.0;
     return (baseKcalPerMin * intensityMultiplier * minutes).round();
   }
 
   @override
   Widget build(BuildContext context) {
-    final duration = _stopwatch.elapsed;
+    final duration = _effectiveDuration;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
