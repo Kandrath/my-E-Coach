@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_e_coach/screens/dashboard_screen.dart';
 import 'package:my_e_coach/screens/profile_screen.dart';
+import 'package:my_e_coach/l10n.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -14,6 +15,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   late PageController _pageController;
 
   // Global State
+  String _languageCode = 'fr';
   String _name = 'Alexandre';
   int _age = 28;
   String _gender = 'Homme';
@@ -71,8 +73,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     });
   }
 
+  void _updateLanguage(String code) {
+    setState(() {
+      _languageCode = code;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLabels.languages[_languageCode]!;
+
     return Scaffold(
       body: PageView(
         controller: _pageController,
@@ -82,6 +92,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             userName: _name,
             calories: _calories,
             water: _water,
+            languageCode: _languageCode,
             onAddWater: _updateWater,
             onAddCalories: _updateCalories,
           ),
@@ -91,19 +102,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             gender: _gender,
             height: _height,
             weight: _weight,
+            languageCode: _languageCode,
             onSave: _updateProfile,
+            onLanguageChanged: _updateLanguage,
           ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Tableau de bord',
+            icon: const Icon(Icons.dashboard),
+            label: l10n.dashboardTitle,
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profil',
+            icon: const Icon(Icons.person),
+            label: l10n.profileTitle,
           ),
         ],
         currentIndex: _selectedIndex,

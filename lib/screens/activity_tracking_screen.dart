@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:my_e_coach/l10n.dart';
 
 class ActivityTrackingScreen extends StatefulWidget {
   final String activityType;
+  final String languageCode;
 
-  const ActivityTrackingScreen({super.key, required this.activityType});
+  const ActivityTrackingScreen({
+    super.key,
+    required this.activityType,
+    required this.languageCode,
+  });
 
   @override
   State<ActivityTrackingScreen> createState() => _ActivityTrackingScreenState();
@@ -59,6 +65,7 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
   }
 
   void _stopActivity() {
+    final l10n = AppLabels.languages[widget.languageCode]!;
     _stopwatch.stop();
     setState(() {
       _isPaused = true;
@@ -68,20 +75,27 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text('Intensité de l\'effort'),
-        content: const Text('Comment qualifieriez-vous votre séance ?'),
-        actions: [
-          _intensityButton('Tranquille', 0.8),
-          _intensityButton('Sportif', 1.0),
-          _intensityButton('Intense', 1.3),
-        ],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.intensityTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.intensityQuestion),
+            const SizedBox(height: 20),
+            _intensityItem(l10n.intensityEasy, 0.8, Colors.green, Icons.spa),
+            const SizedBox(height: 10),
+            _intensityItem(l10n.intensityMedium, 1.0, Colors.amber, Icons.directions_run),
+            const SizedBox(height: 10),
+            _intensityItem(l10n.intensityHard, 1.3, Colors.red, Icons.whatshot),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _intensityButton(String label, double multiplier) {
-    return TextButton(
-      onPressed: () {
+  Widget _intensityItem(String label, double multiplier, Color color, IconData icon) {
+    return InkWell(
+      onTap: () {
         final calories = _calculateCalories(multiplier);
         Navigator.pop(context); // Close dialog
         Navigator.pop(context, {
@@ -91,27 +105,45 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
           'intensity': label,
         }); // Return detailed map to dashboard
       },
-      child: Text(label),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: color, width: 2),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: color),
+            const SizedBox(width: 15),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: color,
+                fontSize: 16,
+              ),
+            ),
+            const Spacer(),
+            Icon(Icons.arrow_forward_ios, color: color, size: 16),
+          ],
+        ),
+      ),
     );
   }
 
   int _calculateCalories(double intensityMultiplier) {
+    final l10n = AppLabels.languages[widget.languageCode]!;
     // Base kcal/min per activity type
     double baseKcalPerMin;
-    switch (widget.activityType) {
-      case 'Marche':
-        baseKcalPerMin = 4.0;
-        break;
-      case 'Course':
-        baseKcalPerMin = 11.0;
-        break;
-      case 'Vélo':
-        baseKcalPerMin = 8.0;
-        break;
-      case 'Autre':
-      default:
-        baseKcalPerMin = 6.0;
-        break;
+    if (widget.activityType == l10n.walking) {
+      baseKcalPerMin = 4.0;
+    } else if (widget.activityType == l10n.running) {
+      baseKcalPerMin = 11.0;
+    } else if (widget.activityType == l10n.cycling) {
+      baseKcalPerMin = 8.0;
+    } else {
+      baseKcalPerMin = 6.0;
     }
 
     double minutes = _effectiveDuration.inSeconds / 60.0;
@@ -120,12 +152,13 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLabels.languages[widget.languageCode]!;
     final duration = _effectiveDuration;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
       appBar: AppBar(
-        title: const Text('Activité en cours'),
+        title: Text(l10n.activityInProgress),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: const Color(0xFF2C3E50),
@@ -146,9 +179,9 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Temps écoulé',
-                style: TextStyle(
+              Text(
+                l10n.elapsedTime,
+                style: const TextStyle(
                   fontSize: 16,
                   color: Color(0xFF7F8C8D),
                 ),
@@ -178,7 +211,7 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
                       ),
                     ),
                     child: Text(
-                      _isPaused ? 'REPRENDRE' : 'PAUSE',
+                      _isPaused ? l10n.resume : l10n.pause,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -192,9 +225,9 @@ class _ActivityTrackingScreenState extends State<ActivityTrackingScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      'STOP',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Text(
+                      l10n.stop,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

@@ -1,0 +1,4 @@
+- [x] Remove `linux/` directory
+- [x] Remove `macos/` directory
+- [x] Remove `web/` directory
+- [x] Create `.metadata` file for Android and iOS

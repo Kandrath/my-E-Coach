@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_e_coach/screens/activity_tracking_screen.dart';
+import 'package:my_e_coach/l10n.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String userName;
   final int calories;
   final int water;
+  final String languageCode;
   final Function(int) onAddWater;
   final Function(int) onAddCalories;
 
@@ -13,6 +15,7 @@ class DashboardScreen extends StatefulWidget {
     required this.userName,
     required this.calories,
     required this.water,
+    required this.languageCode,
     required this.onAddWater,
     required this.onAddCalories,
   });
@@ -23,6 +26,8 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   void _showActivityOptions() {
+    final l10n = AppLabels.languages[widget.languageCode]!;
+    
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -36,9 +41,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Choisir une activité',
-                style: TextStyle(
+              Text(
+                l10n.chooseActivity,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF2C3E50),
@@ -50,10 +55,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 runSpacing: 20,
                 alignment: WrapAlignment.center,
                 children: [
-                  _activityOption('Marche', Icons.directions_walk),
-                  _activityOption('Course', Icons.directions_run),
-                  _activityOption('Vélo', Icons.directions_bike),
-                  _activityOption('Autre', Icons.fitness_center),
+                  _activityOption(l10n.walking, Icons.directions_walk),
+                  _activityOption(l10n.running, Icons.directions_run),
+                  _activityOption(l10n.cycling, Icons.directions_bike),
+                  _activityOption(l10n.other, Icons.fitness_center),
                 ],
               ),
               const SizedBox(height: 20),
@@ -73,7 +78,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             final result = await Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ActivityTrackingScreen(activityType: label),
+                builder: (context) => ActivityTrackingScreen(
+                  activityType: label,
+                  languageCode: widget.languageCode,
+                ),
               ),
             );
 
@@ -103,6 +111,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _showActivitySynthesis(Map<String, dynamic> sessionData) {
+    final l10n = AppLabels.languages[widget.languageCode]!;
     final duration = sessionData['duration'] as Duration;
     final calories = sessionData['calories'] as int;
     final type = sessionData['type'] as String;
@@ -110,9 +119,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     String twoDigits(int n) => n.toString().padLeft(2, "0");
     String formattedDuration =
-        "${twoDigits(duration.inMinutes.remainder(60))}m ${twoDigits(duration.inSeconds.remainder(60))}s";
+        "${twoDigits(duration.inMinutes.remainder(60))}${l10n.minutes} ${twoDigits(duration.inSeconds.remainder(60))}${l10n.seconds}";
     if (duration.inHours > 0) {
-      formattedDuration = "${duration.inHours}h $formattedDuration";
+      formattedDuration = "${duration.inHours}${l10n.hours} $formattedDuration";
     }
 
     showDialog(
@@ -120,17 +129,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Bravo ${widget.userName} ! ✨',
+          '${l10n.congrats} ${widget.userName} ! ✨',
           textAlign: TextAlign.center,
           style: const TextStyle(color: Color(0xFF2C3E50), fontWeight: FontWeight.bold),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Quelle superbe séance ! Vous progressez vers vos objectifs. N\'oubliez pas de bien vous hydrater pour récupérer ! 💧',
+            Text(
+              '${l10n.greatSession} ${l10n.hydrationReminder}',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF7F8C8D)),
+              style: const TextStyle(color: Color(0xFF7F8C8D)),
             ),
             const SizedBox(height: 20),
             Container(
@@ -141,11 +150,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               child: Column(
                 children: [
-                  _synthesisRow('Activité', '$type ($intensity)'),
+                  _synthesisRow(l10n.activity, '$type ($intensity)'),
                   const Divider(),
-                  _synthesisRow('Durée', formattedDuration),
+                  _synthesisRow(l10n.duration, formattedDuration),
                   const Divider(),
-                  _synthesisRow('Dépense', '$calories kcal'),
+                  _synthesisRow(l10n.expense, '$calories kcal'),
                 ],
               ),
             ),
@@ -160,7 +169,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               ),
-              child: const Text('CONTINUER'),
+              child: Text(l10n.continueBtn),
             ),
           ),
         ],
@@ -183,6 +192,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLabels.languages[widget.languageCode]!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
       body: SafeArea(
@@ -197,7 +208,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bonjour, ${widget.userName} ✨',
+                    '${l10n.greeting}, ${widget.userName} ✨',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -205,9 +216,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Text(
-                    "Prenez soin de vous aujourd'hui.",
-                    style: TextStyle(fontSize: 14, color: Color(0xFF7F8C8D)),
+                  Text(
+                    l10n.takeCare,
+                    style: const TextStyle(fontSize: 14, color: Color(0xFF7F8C8D)),
                   ),
                 ],
               ),
@@ -236,9 +247,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           color: Color(0xFF2C3E50),
                         ),
                       ),
-                      const Text(
-                        'kcal dépensées',
-                        style: TextStyle(
+                      Text(
+                        l10n.kcalBurned,
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Color(0xFF7F8C8D),
                         ),
@@ -265,7 +276,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'Hydratation : ${(widget.water / 1000.0).toStringAsFixed(2)}L / 2.5L',
+                      '${l10n.hydration} : ${(widget.water / 1000.0).toStringAsFixed(2)}L / 2.5L',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -286,9 +297,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             borderRadius: BorderRadius.circular(20),
                           ),
                         ),
-                        child: const Text(
-                          '+ 200ml 💧',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.addWater,
+                          style: const TextStyle(
                             color: Color(0xFF1E88E5),
                             fontWeight: FontWeight.w600,
                           ),
@@ -312,9 +323,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text(
-                  'DÉMARRER UNE ACTIVITÉ',
-                  style: TextStyle(
+                child: Text(
+                  l10n.startActivity,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1,

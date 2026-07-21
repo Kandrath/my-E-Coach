@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_e_coach/l10n.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String name;
@@ -6,7 +7,9 @@ class ProfileScreen extends StatefulWidget {
   final String gender;
   final double height;
   final double weight;
+  final String languageCode;
   final Function(String, int, String, double, double) onSave;
+  final Function(String) onLanguageChanged;
 
   const ProfileScreen({
     super.key,
@@ -15,7 +18,9 @@ class ProfileScreen extends StatefulWidget {
     required this.gender,
     required this.height,
     required this.weight,
+    required this.languageCode,
     required this.onSave,
+    required this.onLanguageChanged,
   });
 
   @override
@@ -43,13 +48,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLabels.languages[widget.languageCode]!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFAF9F6),
       appBar: AppBar(
-        title: const Text('Mon Profil'),
+        title: Text(l10n.profileTitle),
         backgroundColor: Colors.white,
         foregroundColor: const Color(0xFF2C3E50),
         elevation: 0,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 10),
+            child: DropdownButton<String>(
+              value: widget.languageCode,
+              underline: const SizedBox(),
+              icon: const Icon(Icons.language, color: Color(0xFFA2B997)),
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  widget.onLanguageChanged(newValue);
+                }
+              },
+              items: const [
+                DropdownMenuItem(value: 'fr', child: Text('FR')),
+                DropdownMenuItem(value: 'en', child: Text('EN')),
+              ],
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -67,23 +93,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 30),
               
-              _buildTextField('Nom', _name, (value) => _name = value),
+              _buildTextField(l10n.nameLabel, _name, (value) => _name = value),
               const SizedBox(height: 15),
               
               Row(
                 children: [
-                  Expanded(child: _buildNumberField('Âge', _age.toString(), (value) => _age = int.parse(value))),
+                  Expanded(child: _buildNumberField(l10n.ageLabel, _age.toString(), (value) => _age = int.parse(value))),
                   const SizedBox(width: 15),
-                  Expanded(child: _buildDropdownField('Genre', _gender, ['Homme', 'Femme', 'Autre'], (value) => _gender = value!)),
+                  Expanded(child: _buildDropdownField(l10n.genderLabel, _gender, [l10n.male, l10n.female, l10n.otherGender], (value) => _gender = value!)),
                 ],
               ),
               const SizedBox(height: 15),
               
               Row(
                 children: [
-                  Expanded(child: _buildNumberField('Taille (cm)', _height.toString(), (value) => _height = double.parse(value))),
+                  Expanded(child: _buildNumberField(l10n.heightLabel, _height.toString(), (value) => _height = double.parse(value))),
                   const SizedBox(width: 15),
-                  Expanded(child: _buildNumberField('Poids (kg)', _weight.toString(), (value) => _weight = double.parse(value))),
+                  Expanded(child: _buildNumberField(l10n.weightLabel, _weight.toString(), (value) => _weight = double.parse(value))),
                 ],
               ),
               
@@ -95,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _formKey.currentState!.save();
                     widget.onSave(_name, _age, _gender, _height, _weight);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Profil mis à jour !')),
+                      SnackBar(content: Text(l10n.profileUpdated)),
                     );
                   }
                 },
@@ -105,7 +131,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                 ),
-                child: const Text('ENREGISTRER', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(l10n.saveBtn, style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -143,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildDropdownField(String label, String currentValue, List<String> options, Function(String?) onChanged) {
     return DropdownButtonFormField<String>(
-      value: currentValue,
+      initialValue: options.contains(currentValue) ? currentValue : options[0],
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
